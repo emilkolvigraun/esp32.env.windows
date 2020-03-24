@@ -108,41 +108,39 @@ if __name__ == '__main__':
             send(connection, "print('LIST:','{0}',os.listdir('{0}'))".format(dirname))
 
         for file in scripts:
-            # make a temp file
-            path1 = os.path.join(root,file)
-            infile = open(path1, 'r')
-            path2 ='compressed_'+file
-            # smash files
-            if os.path.splitext(file)[1].lower() == '.py':
-                outfile = open(path2, mode='w')
-                for line in infile:
-                    line2 = line.strip()
-                    if not line2:
-                        pass
-                    elif line2.startswith('#'):
-                        pass
-                    elif '#' in line2:
-                        outfile.write(line.rstrip().rsplit('#',1)[0]+'\n')
-                    else:
-                        outfile.write(line.rstrip()+'\n')
-                outfile.close()
+            try:
+                # make a temp file
+                path1 = os.path.join(root,file)
+                infile = open(path1, 'r')
+                path2 ='compressed_'+file
+                # smash files
+                if os.path.splitext(file)[1].lower() == '.py':
+                    outfile = open(path2, mode='w')
+                    for line in infile:
+                        line2 = line.strip()
+                        if not line2:
+                            pass
+                        elif line2.startswith('#'):
+                            pass
+                        elif '#' in line2:
+                            outfile.write(line.rstrip().rsplit('#',1)[0]+'\n')
+                        else:
+                            outfile.write(line.rstrip()+'\n')
+                    outfile.close()
+                    infile.close()
+
+                path3 = path1.replace(system_dir,'').lstrip('/')
+                send(connection, 'outfile=open("%s",mode="wb")'%path3)
+                infile = open(path2,mode='rb')
+                while 1:
+                    data = infile.read(1024)
+                    if not data: break
+                    send(connection, "outfile.write({})".format(data))
+                send(connection, "outfile.close()")
                 infile.close()
-
-            path3 = path1.replace(system_dir,'').lstrip('/')
-            send(connection, 'outfile=open("%s",mode="wb")'%path3)
-            infile = open(path2,mode='rb')
-            while 1:
-                data = infile.read(1024)
-                if not data: break
-                send(connection, "outfile.write({})".format(data))
-            send(connection, "outfile.close()")
-            infile.close()
-            os.remove(path2)
-
-    print('Listing:')
-    send(connection, 'import os')
-    send(connection, 'print(os.listdir())')
-    print('')
+                os.remove(path2)
+            except:
+                pass
     
     connection.write([3,3])
     receive(connection, True)
