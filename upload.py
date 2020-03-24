@@ -1,3 +1,5 @@
+# leave boot.py empty
+
 import sys, time, serial, re, os, shutil
 
 rbuffer = ''
@@ -8,7 +10,7 @@ system_dir = os.getcwd() + '\\scripts'
 def error(tag:str, msg:str):
 
     # will exit the program when called upon
-    exit('%s | ERROR, %s : %s'%(str(round(time.time())), tag, msg))
+    exit('%s | ERROR, %s : %s\nexited.'%(str(round(time.time())), tag, msg))
 
 # this def prints out a guideline for the user
 def print_help():
@@ -59,9 +61,6 @@ def send(conection, string:str=''):
     connection.write([ord(v) for v in string+'\r'])
     receive(connection)
 
-def replace_strings(match_object):
-    return 'X' * len(match_object.group())
-
 if __name__ == '__main__':
     # validate if input is correct
     validate_paramters(sys.argv)    
@@ -96,57 +95,52 @@ if __name__ == '__main__':
 
     for root, dirs, files in os.walk(system_dir):
 
-        for d in dirs:
-            path1 = os.path.join(root,d)
-            path2 = path1.replace(system_dir,'').lstrip('/')
-            dirname,basename = os.path.split(path2)
-            if dirname:
-                send(connection, "if '{1}' not in os.listdir('{0}'): os.mkdir('{0}/{1}')".format(dirname,basename))
-            else:
-                send(connection, "if '{0}' not in os.listdir(): os.mkdir('{0}')".format(basename))
-            send(connection)
-            send(connection, "print('LIST:','{0}',os.listdir('{0}'))".format(dirname))
+        for x in files[:]:
+            if scripts and x not in scripts:
+                files.remove(x)
+            print('')
+            print(x)
+        
+        files.sort()    
 
-        for file in scripts:
-            try:
-                # make a temp file
-                path1 = os.path.join(root,file)
-                infile = open(path1, 'r')
-                path2 ='compressed_'+file
-                # smash files
-                if os.path.splitext(file)[1].lower() == '.py':
-                    outfile = open(path2, mode='w')
-                    for line in infile:
-                        line2 = line.strip()
-                        if not line2:
-                            pass
-                        elif line2.startswith('#'):
-                            pass
-                        elif '#' in line2:
-                            outfile.write(line.rstrip().rsplit('#',1)[0]+'\n')
-                        else:
-                            outfile.write(line.rstrip()+'\n')
-                    outfile.close()
-                    infile.close()
+        for file in files:
+            path1 = os.path.join(root,file)
+            infile = open(path1, 'r')
+            path2 ='compressed_'+file
 
-                path3 = path1.replace(system_dir,'').lstrip('/')
-                send(connection, 'outfile=open("%s",mode="wb")'%path3)
-                infile = open(path2,mode='rb')
+            if os.path.splitext(file)[1].lower() == '.py':
+                print('ANALYZING', 'PATH {', os.path.splitext(file), '}')
+                outfile = open(path2,mode='w')
+                for line in infile:
+                    line2 = line.strip()
+                    if not line2:
+                        pass
+                    elif line2.startswith('#'):
+                        pass
+                    else:
+                        outfile.write(line.rstrip()+'\n')
+                
+                outfile.close()
+            infile.close()
+
+            path3 = path1.replace(system_dir,'').lstrip('/')
+            send(connection, "outfile=None")
+            with open(path2, mode='rb') as f:
                 while 1:
-                    data = infile.read(1024)
-                    if not data: break
+                    data = f.read(1024)
+                    if not data:
+                        break
+                    send(connection, "outfile=open('{}',mode='wb')".format(path3))
+                    time.sleep(0.5)
                     send(connection, "outfile.write({})".format(data))
-                send(connection, "outfile.close()")
-                infile.close()
-                os.remove(path2)
-            except:
-                pass
+                    time.sleep(0.5)
+                    send(connection, "outfile.close()")
+                    time.sleep(0.5)
+         
+            os.remove(path2)
     
     connection.write([3,3])
     receive(connection, True)
     connection.close()
 
     print('--- SCRIPT(S) UPLOADED ---')
-            
-
-

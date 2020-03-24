@@ -1,14 +1,7 @@
-print('- loading external temperature sensor')
-from external_temp import exttempsensor
+# main is colled once after boot
 
-print('- init external temperature sensor')
-sensor = exttempsensor()
+print('RUN: main.py')
 
-print('- starting sensor data collection')
-sensor.run()
+import external_temp
 
-
-
-
-
-
+external_temp.start()

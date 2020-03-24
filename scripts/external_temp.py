@@ -1,24 +1,29 @@
-from machine import ADC, Pin
-import time, UART
+# transmit temperature data to serial port with 2hz
 
-class exttempsensor:
+from machine import Pin, ADC
+import sys, time
 
-    def __init__(self):
-        self.pin_in = 12
-        self.pin_out = 13 
+# declaring external sensor pin
+sensor = ADC(Pin(39, Pin.IN))
 
-        self.t_sensor_adc = ADC(Pin(self.pin_in, Pin.IN))
-        self.t_sensor_pow = Pin(self.pin_out, Pin.OUT)
+# defining voltage out
+power = Pin(2, Pin.OUT)
+power.value(1)
 
-        self.t_sensor_adc.atten(ADC.ATTN_6DB)
-        self.t_sensor_adc.width(ADC.WIDTH_12BIT)
+# configurations
+sensor.atten(ADC.ATTN_6DB)
+sensor.width(ADC.WIDTH_12BIT)
 
-        self.connection = UART(1, 115200)                         # init with given baudrate
-        self.connection.init(115200, bits=8, parity=None, stop=1) # init with given parameter
+# run forever
+while 1:
+  
+  # retrieving value from sensor
+  value = sensor.read()
+  voltage_conversion=((value.read()*2)/4096)
+  value = ((voltage_conversion-0.5)/0.01)
 
-    def run(self):
-        while True:
-            value = self.t_sensor_adc.read()
-            self.connection.write('%s,%s'%(str(time.time()), str(value)))
+  # write to serial port
+  sys.stdout.write('{}'.format(round(value)))
 
-        self.connection.deinit()
+  # sleet half a second
+  time.sleep(0.5)
