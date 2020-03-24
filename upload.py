@@ -108,7 +108,6 @@ if __name__ == '__main__':
             send(connection, "print('LIST:','{0}',os.listdir('{0}'))".format(dirname))
 
         for file in scripts:
-            print(file)
             # make a temp file
             path1 = os.path.join(root,file)
             infile = open(path1, 'r')
