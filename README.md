@@ -7,7 +7,9 @@ Requirements:
 * pip install pyserial
 * `OPTIONAL` pip install rshell
 
-With *rshell* you can verify whether the scripts you wanted to upload, was actually uploaded.
+With *rshell* you can verify whether the scripts you wanted to upload, was actually uploaded.<br>
+
+The repository includes an example.
 
 ## Get Started
 
@@ -58,6 +60,6 @@ boot.py     main.py     external_temp.py
 
 ## Further
 
-* *Note*:boot.py must be left empty, however, added to upload (e.g declared inside "temperature_project.txt") as first item.
+* *Note*: boot.py must be left empty, however, added to upload (e.g declared inside "temperature_project.txt") as first item.
 * *Bug*: in some cases, the upload script throws an `OSError: [Errno 2] ENOENT` error. This is because a main.py script has not yet been created, and can be ignored. 
-* *Note*: The driver has not yet been tested with any other firmware than the version stated in _Get Started_.
+* *Note*: the driver has not yet been tested with any other firmware than the version stated in _Get Started_.
