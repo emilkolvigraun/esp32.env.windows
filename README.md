@@ -1,4 +1,4 @@
-# Micropython environment for ESP32 | Windows
+# Micropython macro for ESP32 | Windows
 
 This is a tool for for uploading a set of scripts to a system chip on a microcontroller. Basically, it relieves you from the hassle of having to manually re-upload a scipt any time you have made a change to it. Furthermore, *the driver will take care of flashing your device for you*.
 
