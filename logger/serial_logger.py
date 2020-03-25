@@ -1,6 +1,6 @@
-import serial, time
+import serial, time, sys
 
-port = 'COM5'
+port = ''
 baudrate = 115200
 
 def read():
@@ -23,11 +23,15 @@ def read():
 
             # print to console
             print(round(time.time()), 'received value =', value)
+            
     except KeyboardInterrupt:
         file.close()
         exit('Finished.')
 
-print('Starting read from serial:')
-read()
+
+if __name__ == '__main__':
+    port = sys.argv[2]
+    print('Starting read from serial:')
+    read()
         
 

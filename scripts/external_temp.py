@@ -36,6 +36,3 @@ while 1:
 
         # reset list
         values = list()
-    
-    # delay the process 1/10000th hz
-    time.sleep(0.0001)
