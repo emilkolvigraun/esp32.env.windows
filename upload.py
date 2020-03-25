@@ -59,6 +59,11 @@ def send(conection, string:str=''):
     connection.write([ord(v) for v in string+'\r'])
     receive(connection, False)
 
+def write_to_file(connection, data:list):
+    for v in data:
+        send(connection, v)
+        time.sleep(0.1)
+
 if __name__ == '__main__':
     # validate if input is correct
     validate_paramters(sys.argv)    
@@ -91,22 +96,22 @@ if __name__ == '__main__':
 
     send(connection, 'import os')
 
+    updated = []
     for root, dirs, files in os.walk(system_dir):
 
-        for x in files[:]:
-            if scripts and x not in scripts:
-                files.remove(x)
-        
-        files.sort()    
-
         for file in files:
+            if file not in scripts:
+                continue
+
+            updated.append(file)
+            
+            print('- starting to upload', file)
+
             path1 = os.path.join(root,file)
             infile = open(path1, 'r')
             path2 ='compressed_'+file
 
             if '.py' in str(file):
-
-                print('>\nANALYZING PATH {', os.path.splitext(file), '}')
 
                 outfile = open(path2, 'w')
                 for line in infile:
@@ -123,16 +128,11 @@ if __name__ == '__main__':
                 while True:
                     data = f.read(1024)
                     if not data: break
-                    send(connection, "outfile=open('{}',mode='wb')".format(path3))
-                    time.sleep(0.5)
-                    send(connection, "outfile.write({})".format(data))
-                    time.sleep(0.5)
-                    send(connection, "outfile.close()")
-                    time.sleep(0.5)
+                    write_to_file(connection, ["outfile=open('{}',mode='wb')".format(path3), "outfile.write({})".format(data), "outfile.close()"])
             os.remove(path2)
-    
     connection.write([3,3])
     receive(connection)
     connection.close()
 
     print('--- SCRIPT(S) UPLOADED ---')
+    print('- uploaded:', updated)
