@@ -34,16 +34,14 @@ def validate_paramters(params):
         print_help()
         error('argv', 'You did not enter the requirement input parameters')
 
-def receive(connection, done:bool=False):
+def receive(connection, done:bool=True):
     global rbuffer
 
     # collect return from serial
-    while 1:
+    while True:
         data = connection.read(1024)
-        if not data:
-            break
-        else:
-            rbuffer += data.decode(encoding='utf-8',errors='?')
+        if not data: break
+        else: rbuffer += data.decode(encoding='utf-8',errors='?')
     rbuffer = rbuffer.replace('\r','')
 
     # print return lines
@@ -59,7 +57,7 @@ def receive(connection, done:bool=False):
 
 def send(conection, string:str=''):
     connection.write([ord(v) for v in string+'\r'])
-    receive(connection)
+    receive(connection, False)
 
 if __name__ == '__main__':
     # validate if input is correct
@@ -82,8 +80,8 @@ if __name__ == '__main__':
     # establish connection to serial port
     connection = serial.Serial(port=port,baudrate=baudrate,timeout=timeout)
     connection.flush()
-    connection.write([3,3]) # equivalent with CTRL-C
-    receive(connection, True)
+    connection.write([3,3]) 
+    receive(connection)
 
     print('settings:')
     print('- port: %s, speed: %s, timeout: %s'%(port, baudrate, timeout))
@@ -98,8 +96,6 @@ if __name__ == '__main__':
         for x in files[:]:
             if scripts and x not in scripts:
                 files.remove(x)
-            print('')
-            print(x)
         
         files.sort()    
 
@@ -108,39 +104,35 @@ if __name__ == '__main__':
             infile = open(path1, 'r')
             path2 ='compressed_'+file
 
-            if os.path.splitext(file)[1].lower() == '.py':
-                print('ANALYZING', 'PATH {', os.path.splitext(file), '}')
-                outfile = open(path2,mode='w')
+            if '.py' in str(file):
+
+                print('>\nANALYZING PATH {', os.path.splitext(file), '}')
+
+                outfile = open(path2, 'w')
                 for line in infile:
                     line2 = line.strip()
-                    if not line2:
-                        pass
-                    elif line2.startswith('#'):
-                        pass
-                    else:
-                        outfile.write(line.rstrip()+'\n')
-                
+                    if not line2: pass
+                    elif line2.startswith('#'): pass
+                    else: outfile.write(line.rstrip()+'\n')
                 outfile.close()
             infile.close()
 
             path3 = path1.replace(system_dir,'').lstrip('/')
             send(connection, "outfile=None")
-            with open(path2, mode='rb') as f:
-                while 1:
+            with open(path2, 'rb') as f:
+                while True:
                     data = f.read(1024)
-                    if not data:
-                        break
+                    if not data: break
                     send(connection, "outfile=open('{}',mode='wb')".format(path3))
                     time.sleep(0.5)
                     send(connection, "outfile.write({})".format(data))
                     time.sleep(0.5)
                     send(connection, "outfile.close()")
                     time.sleep(0.5)
-         
             os.remove(path2)
     
     connection.write([3,3])
-    receive(connection, True)
+    receive(connection)
     connection.close()
 
     print('--- SCRIPT(S) UPLOADED ---')

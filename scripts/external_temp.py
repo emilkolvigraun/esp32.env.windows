@@ -1,4 +1,4 @@
-# transmit temperature data to serial port with 2hz
+# transmit temperature data to serial port
 
 from machine import Pin, ADC
 import sys, time
@@ -6,7 +6,7 @@ import sys, time
 # declaring external sensor pin
 sensor = ADC(Pin(39, Pin.IN))
 
-# defining voltage out
+# defining voltage out (VDD)
 power = Pin(2, Pin.OUT)
 power.value(1)
 
@@ -14,16 +14,28 @@ power.value(1)
 sensor.atten(ADC.ATTN_6DB)
 sensor.width(ADC.WIDTH_12BIT)
 
+# define list of values to obtain mean
+values = list()
+
 # run forever
 while 1:
-  
-  # retrieving value from sensor
-  value = sensor.read()
-  voltage_conversion=((value.read()*2)/4096)
-  value = ((voltage_conversion-0.5)/0.01)
+    # retrieving value from sensor
+    value = sensor.read()
 
-  # write to serial port
-  sys.stdout.write('{}'.format(round(value)))
+    # append each value
+    values.append(float(value))
 
-  # sleet half a second
-  time.sleep(0.5)
+    # get the mean of 100 values
+    if len(values) >= 100:
+
+        # calculate mean
+        mean_value = sum(values)/len(values)
+
+        # write to serial port
+        sys.stdout.write('{}'.format(round(mean_value)))
+
+        # reset list
+        values = list()
+    
+    # delay the process 1/10000th hz
+    time.sleep(0.0001)
