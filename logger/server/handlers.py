@@ -24,7 +24,7 @@ class Handlers:
         processed_payload = payload   
 
         # just use the helper method
-        self.store(processed_payload, str(round(time.time())))
+        await self.store(processed_payload, str(round(time.time())))
 
         return web.Response(text='')
     
@@ -35,20 +35,20 @@ class Handlers:
         payload = (await request.read()).decode('utf-8')
 
         # TODO: process payload such that: str(time_send,lux,temp,iteration)
-        processed_payload = str(payload.split(','))   
+        processed_payload = payload  
 
         # just use the helper method
-        self.store(processed_payload, str(round(time.time())))
+        await self.store(processed_payload, str(round(time.time())))
 
         return web.Response(text='')
         
-    def store(self, payload, time_received):
-
+    async def store(self, payload, time_received):
+        print('received:', payload[:-1])
         # open file as append
         with open('log.txt', 'a') as f:
 
             # write to file
             # will be: ts_received,ts_send,lux,temp,index\n
-            f.write('%s,%s\n'%(time_received, payload))
+            f.write('%s,%s'%(time_received, payload))
             # verify that file is satisfactory (run a test)
 
