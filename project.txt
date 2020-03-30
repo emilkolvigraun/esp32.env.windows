@@ -1,3 +1,6 @@
 boot.py
-external_temp.py
 main.py
+bh1750.py
+HTS221.py
+smbus.py
+wifi_transmitter.py

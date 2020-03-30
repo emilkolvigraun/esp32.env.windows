@@ -1,5 +1,8 @@
-import network
-import socket
+import network, machine, time, socket, sys, HTS221
+from bh1750 import BH1750
+import HTS221
+
+print('RUN: Finished importing')
 
 def connect():
     conn = network.WLAN(network.STA_IF)
@@ -23,3 +26,17 @@ def post(data, url):
 
     s.send(bytes('%s%s'%(header,payload), 'utf-8'))
     s.close()
+
+scl = machine.Pin(5)
+sda = machine.Pin(4)
+i2c = machine.I2C(scl,sda)
+
+lux_sensor = BH1750(i2c)
+hts = HTS221.HTS221()
+
+while True:
+    lux_value = lux_sensor.luminance(BH1750.ONCE_HIRES_1)
+    temp_value = hts.readTemp()
+    print('lux:', lux_value,'\n')
+    print('temp:', temp_value,'\n')
+    time.sleep(2)

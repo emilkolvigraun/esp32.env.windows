@@ -8,7 +8,7 @@ class Handlers:
         self.routes =   [
                             web.get('/', self.main),
                             web.post('/store/public', self.store_public),
-                            web.post('/store/local', self.store_local),
+                            web.post('/store/local', self.store_local)
                         ]
 
     async def main(self, request):
