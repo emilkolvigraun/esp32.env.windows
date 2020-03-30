@@ -24,7 +24,7 @@ class Handlers:
         processed_payload = payload   
 
         # just use the helper method
-        await self.store(processed_payload, str(round(time.time())))
+        await self.store(processed_payload, str(round(time.time())), 'local-log.txt')
 
         return web.Response(text='')
     
@@ -38,14 +38,14 @@ class Handlers:
         processed_payload = payload  
 
         # just use the helper method
-        await self.store(processed_payload, str(round(time.time())))
+        await self.store(processed_payload, str(round(time.time())), 'public-log.txt')
 
         return web.Response(text='')
         
-    async def store(self, payload, time_received):
+    async def store(self, payload, time_received, title):
         print('received:', payload[:-1])
         # open file as append
-        with open('log.txt', 'a') as f:
+        with open(title, 'a') as f:
 
             # write to file
             # will be: ts_received,ts_send,lux,temp,index\n
