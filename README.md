@@ -58,6 +58,10 @@ In both cases, the output should be an overview of your scripts:
 boot.py     main.py     external_temp.py
 ```
 
+## Logging
+
+There is a serial logger located in the `/logs/` folder. It reads 4 bytes from the serial line at a time. Adjust this, if you are transmitting larger messages. Furthermore, there is a simple `aiohttp` server location in the same folder. The server uses two routes, `/store/local/` and `/store/public` to store data sent from local area network or www. It must be adjusted to your requirements.
+
 ## Further
 
 * *Note*: boot.py must be left empty, however, added to upload (e.g declared inside "temperature_project.txt") as first item.

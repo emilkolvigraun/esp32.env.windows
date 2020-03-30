@@ -14,7 +14,7 @@ def read():
     try:
         while True:
 
-            # read value, should be 4 bits long
+            # read value, should be 4 bytes long
             # decode to utf-8
             value = connection.read(4).decode('utf-8')
 

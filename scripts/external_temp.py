@@ -1,7 +1,7 @@
 # transmit temperature data to serial port
 
 from machine import Pin, ADC
-import sys, time
+import sys
 
 # declaring external sensor pin
 sensor = ADC(Pin(39, Pin.IN))
@@ -26,7 +26,7 @@ while 1:
     values.append(float(value))
 
     # get the mean of 100 values
-    if len(values) >= 100:
+    if len(values) >= 150:
 
         # calculate mean
         mean_value = sum(values)/len(values)
